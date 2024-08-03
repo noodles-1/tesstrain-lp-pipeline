@@ -1,5 +1,6 @@
 import json
 import cv2
+import albumentations as A
 
 project_dir = 'project-1'
 
@@ -7,6 +8,28 @@ with open(f'{project_dir}/result.json') as json_file:
     data = json.load(json_file)
 
 data['annotations'].append({ 'image_id': -1 })
+
+transform_pipeline = A.Compose([
+    A.Affine(
+        scale=(0.8, 1.4),
+        translate_percent=(0.1, 0.1),
+        rotate=0,
+        shear=(-10, 10),
+        cval=(0, 0, 0),
+        p=1
+    ),
+    A.LongestMaxSize(max_size=640, interpolation=cv2.INTER_LINEAR),
+    A.PadIfNeeded(
+        min_height=640,
+        min_width=640,
+        border_mode=cv2.BORDER_CONSTANT,
+        value=(0, 0, 0)
+    )
+], bbox_params=A.BboxParams(
+    format='coco',
+    min_visibility=0.7,
+    label_fields=['class_labels']
+))
     
 image_id = 0
 plate = []
