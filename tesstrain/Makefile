@@ -234,9 +234,6 @@ $(ALL_GT): $(ALL_FILES) | $(OUTPUT_DIR)
 %.box: %.raw.png %.gt.txt
 	PYTHONIOENCODING=utf-8 $(PY_CMD) $(GENERATE_BOX_SCRIPT) -i "$*.raw.png" -t "$*.gt.txt" > "$@"
 
-%.box: %.tif %.gt.txt
-	PYTHONIOENCODING=utf-8 $(PY_CMD) $(GENERATE_BOX_SCRIPT) -i "$*.tif" -t "$*.gt.txt" > "$@"
-
 $(ALL_LSTMF): $(ALL_FILES:%.gt.txt=%.lstmf)
 	$(if $^,,$(error found no $(GROUND_TRUTH_DIR)/*.lstmf for $@))
 	@mkdir -p $(@D)
