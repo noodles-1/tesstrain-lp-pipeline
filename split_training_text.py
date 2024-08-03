@@ -12,7 +12,7 @@ with open(training_text_file, 'r') as input_file:
     for line in input_file.readlines():
         lines.append(line.strip())
 
-output_directory = 'tesstrain/data/FE-ground-truth'
+output_directory = 'tesstrain/data/LP-ground-truth'
 
 if not os.path.exists(output_directory):
     os.mkdir(output_directory)
@@ -34,11 +34,10 @@ for line in lines:
         '--font=FE-Font',
         f'--text={line_training_text}',
         f'--outputbase={output_directory}/{file_base_name}',
-        '--max_pages=0',
+        '--max_pages=1',
         '--strip_unrenderable_words',
         '--degrade_image',
         '--rotate_image',
-        '--bidirectional_rotation',
         '--leading=32',
         '--xsize=3600',
         '--ysize=480',
