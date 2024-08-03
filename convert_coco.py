@@ -62,30 +62,30 @@ for annotation in data['annotations']:
 for image in images:
     img = cv2.imread(f'projects/{project_dir}/{image["file_name"]}')
 
-    for i in range(1, 5):
-        scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
-        scaled_img = scaled['image']
-        scaled_bboxes = scaled['bboxes']
-        scaled_labels = scaled['class_labels']
+    scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
+    scaled_img = scaled['image']
+    scaled_bboxes = scaled['bboxes']
+    scaled_labels = scaled['class_labels']
 
-        image_name = image['file_name'].split('.')[0].split('/')[1]
+    image_name = image['file_name'].split('.')[0].split('/')[1]
 
-        with open(f'{dir}/eng_{image_name}_{i}.gt.txt', mode='w') as file:
-            file.write(''.join(scaled_labels))
+    with open(f'{dir}/eng_{image_name}.gt.txt', mode='w') as file:
+        file.write(''.join(scaled_labels))
 
-        with open(f'{dir}/eng_{image_name}_{i}.box', mode='a') as file:
-            for j in range(len(scaled_bboxes)):
-                x, y, w, h = scaled_bboxes[j]
-                bbox = [int(x), int(y), int(x + w), int(y + h)]
+    with open(f'{dir}/eng_{image_name}.box', mode='a') as file:
+        for j in range(len(scaled_bboxes)):
+            x, y, w, h = scaled_bboxes[j]
+            bbox = [int(x), int(y), int(x + w), int(y + h)]
 
-                line = [scaled_labels[j]]
-                line.extend(bbox)
-                line.extend(['0', '\n'])
-                line = [str(elem) for elem in line]
-                file.write(' '.join(line))
-        
-        cv2.imwrite(f'{dir}/eng_{image_name}_{i}.tif', scaled_img)
+            line = [scaled_labels[j]]
+            line.extend(bbox)
+            line.extend(['0', '\n'])
+            line = [str(elem) for elem in line]
+            file.write(' '.join(line))
+    
+    cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
+    '''
     for i in range(1, 5):
         transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
         transformed_img = transformed['image']
@@ -107,3 +107,4 @@ for image in images:
                 file.write(' '.join(line))
 
         cv2.imwrite(f'{dir}/eng_{image_name}_aug_{i}.tif', transformed_img)
+    '''
