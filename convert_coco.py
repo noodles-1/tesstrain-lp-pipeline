@@ -3,7 +3,7 @@ import cv2
 import random
 import albumentations as A
 
-project_dir = 'demo-project-4'
+project_dir = 'annotation-1'
 
 with open(f'projects/{project_dir}/result.json') as json_file:
     data = json.load(json_file)
@@ -24,9 +24,9 @@ scale_pipeline = A.Compose([
 transform_pipeline = A.Compose([
     A.Affine(
         scale=(0.8, 1.2),
-        translate_percent=(0.05, 0.05),
+        translate_percent=0,
         rotate=0,
-        shear=(-2, 2),
+        shear=5,
         cval=(0, 0, 0),
         p=1
     ),
@@ -85,7 +85,6 @@ for image in images:
     
     cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
-    '''
     for i in range(1, 5):
         transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
         transformed_img = transformed['image']
@@ -107,4 +106,3 @@ for image in images:
                 file.write(' '.join(line))
 
         cv2.imwrite(f'{dir}/eng_{image_name}_aug_{i}.tif', transformed_img)
-    '''
