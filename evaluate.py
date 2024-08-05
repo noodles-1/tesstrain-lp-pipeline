@@ -24,15 +24,22 @@ def min_error(str1, str2):
 
 total_err = 0
 total = 0
-ground_plate = 'GAD3282'
+ground_plate = 'LAH8398'
 
-for image_file in os.listdir('test'):
-    image = cv2.imread(f'test/{image_file}')
+models = ['eng', 'LP']
+psms = [7, 8]
 
-    tesseract_predicted = pytesseract.image_to_string(image, lang='LP', config='--tessdata-dir tesstrain/data --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
-    tesseract_predicted = tesseract_predicted.strip().replace(' ', '')
-    total_err += min_error(tesseract_predicted, ground_plate)
-    total += len(ground_plate)
+for model in models:
+    tessdata = '' if model == 'eng' else '--tessdata-dir tesstrain/data '
 
-accuracy = (total - total_err) / total
-print(f'accuracy: ', accuracy * 100)
+    for psm in psms:
+        for image_file in os.listdir('test'):
+            image = cv2.imread(f'test/{image_file}')
+
+            tesseract_predicted = pytesseract.image_to_string(image, lang=model, config=f'{tessdata}--psm {psm} -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
+            tesseract_predicted = tesseract_predicted.strip().replace(' ', '')
+            total_err += min_error(tesseract_predicted, ground_plate)
+            total += len(ground_plate)
+
+        accuracy = (total - total_err) / total
+        print(f'{model} psm {psm} accuracy: ', accuracy * 100)

@@ -4,7 +4,7 @@ import cv2
 import random
 import albumentations as A
 
-project_dir = 'annotation-1'
+project_dir = 'annotation-2'
 
 with open(f'projects/{project_dir}/result.json') as json_file:
     data = json.load(json_file)
@@ -50,6 +50,14 @@ if not os.path.exists(dir):
     os.makedirs(dir)
 
 images = []
+include = set([
+    '1c1f1af8-IMG_5702-67448',
+    '5b453f98-IMG_5708-31806',
+    '5c784cd0-IMG_5703-87512',
+    '41edc22d-IMG_5707-79571',
+    '60e97e43-IMG_5704-79170',
+    'b6b3aeea-IMG_5709-40473',
+])
 
 for annotation in data['annotations']:
     if len(images) < annotation['image_id'] + 1:
@@ -62,9 +70,14 @@ for annotation in data['annotations']:
     label = data['categories'][annotation['category_id']]['name']
     
     images[-1]['bboxes'].append(annotation['bbox'])
-    images[-1]['labels'].append(label if label != 'space' else ' ')
+    images[-1]['labels'].append(label)
 
 for image in images:
+    image_name = image['file_name'].split('.')[0].split('/')[1]
+
+    if image_name not in include:
+        continue
+
     img = cv2.imread(f'projects/{project_dir}/{image["file_name"]}')
 
     scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
@@ -72,7 +85,6 @@ for image in images:
     scaled_bboxes = scaled['bboxes']
     scaled_labels = scaled['class_labels']
 
-    image_name = image['file_name'].split('.')[0].split('/')[1]
 
     with open(f'{dir}/eng_{image_name}.gt.txt', mode='w') as file:
         file.write(''.join(scaled_labels))
@@ -90,7 +102,7 @@ for image in images:
     
     cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
-    for i in range(1, 31):
+    for i in range(1, 21):
         transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
         transformed_img = transformed['image']
         transformed_bboxes = transformed['bboxes']
