@@ -21,18 +21,19 @@ def min_error(str1, str2):
             ) + 1
     
     return dp[0][0]
-
-total_err = 0
-total = 0
-ground_plate = 'LAH8398'
+ground_plate = 'NAY6182'
 
 models = ['eng', 'LP']
 psms = [7, 8]
+res = []
 
 for model in models:
     tessdata = '' if model == 'eng' else '--tessdata-dir tesstrain/data '
 
     for psm in psms:
+        total_err = 0
+        total = 0
+
         for image_file in os.listdir('test'):
             image = cv2.imread(f'test/{image_file}')
 
@@ -42,4 +43,7 @@ for model in models:
             total += len(ground_plate)
 
         accuracy = (total - total_err) / total
-        print(f'{model} psm {psm} accuracy: ', accuracy * 100)
+        res.append(f'{model} psm {psm} accuracy: {accuracy * 100}')
+
+for r in res:
+    print(r)

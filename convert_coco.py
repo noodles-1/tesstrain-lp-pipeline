@@ -4,7 +4,7 @@ import cv2
 import random
 import albumentations as A
 
-project_dir = 'annotation-2'
+project_dir = 'annotation-4'
 
 with open(f'projects/{project_dir}/result.json') as json_file:
     data = json.load(json_file)
@@ -75,16 +75,12 @@ for annotation in data['annotations']:
 for image in images:
     image_name = image['file_name'].split('.')[0].split('/')[1]
 
-    if image_name not in include:
-        continue
-
     img = cv2.imread(f'projects/{project_dir}/{image["file_name"]}')
 
     scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
     scaled_img = scaled['image']
     scaled_bboxes = scaled['bboxes']
     scaled_labels = scaled['class_labels']
-
 
     with open(f'{dir}/eng_{image_name}.gt.txt', mode='w') as file:
         file.write(''.join(scaled_labels))
@@ -102,7 +98,7 @@ for image in images:
     
     cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
-    for i in range(1, 21):
+    for i in range(1, 101):
         transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
         transformed_img = transformed['image']
         transformed_bboxes = transformed['bboxes']

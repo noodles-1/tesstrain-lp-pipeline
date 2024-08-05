@@ -4,7 +4,7 @@ import cv2
 import random
 import albumentations as A
 
-project_dir = 'annotation-2'
+project_dir = 'annotation-4'
 
 with open(f'projects/{project_dir}/result.json') as json_file:
     data = json.load(json_file)
@@ -59,9 +59,6 @@ for annotation in data['annotations']:
 
 for image in images:
     image_name = image['file_name'].split('.')[0].split('/')[1]
-
-    if image_name not in include:
-        continue
 
     img = cv2.imread(f'projects/{project_dir}/{image["file_name"]}')
 
