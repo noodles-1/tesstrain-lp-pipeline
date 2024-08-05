@@ -1,3 +1,4 @@
+import os
 import json
 import cv2
 import random
@@ -11,10 +12,10 @@ with open(f'projects/{project_dir}/result.json') as json_file:
 scale_pipeline = A.Compose([
     A.LongestMaxSize(max_size=640, interpolation=cv2.INTER_LINEAR),
     A.PadIfNeeded(
-        min_height=300,
-        min_width=640,
+        min_height=400,
+        min_width=854,
         border_mode=cv2.BORDER_CONSTANT,
-        value=(255, 255, 255)
+        value=(0, 0, 0)
     )
 ], bbox_params=A.BboxParams(
     format='coco',
@@ -26,14 +27,14 @@ transform_pipeline = A.Compose([
         scale=(0.8, 1.2),
         translate_percent=0,
         rotate=0,
-        shear=5,
+        shear=(-5, 5),
         cval=(0, 0, 0),
         p=1
     ),
     A.LongestMaxSize(max_size=640, interpolation=cv2.INTER_LINEAR),
     A.PadIfNeeded(
-        min_height=300,
-        min_width=640,
+        min_height=400,
+        min_width=854,
         border_mode=cv2.BORDER_CONSTANT,
         value=(0, 0, 0)
     )
@@ -44,6 +45,10 @@ transform_pipeline = A.Compose([
 ))
 
 dir = 'tesstrain/data/LP-ground-truth'
+
+if not os.path.exists(dir):
+    os.makedirs(dir)
+
 images = []
 
 for annotation in data['annotations']:
@@ -85,7 +90,7 @@ for image in images:
     
     cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
-    for i in range(1, 5):
+    for i in range(1, 31):
         transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
         transformed_img = transformed['image']
         transformed_bboxes = transformed['bboxes']
