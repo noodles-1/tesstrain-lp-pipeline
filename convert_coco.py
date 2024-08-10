@@ -4,7 +4,7 @@ import cv2
 import random
 import albumentations as A
 
-project_dir = 'annotation-4'
+project_dir = 'pagtalunan-2'
 
 with open(f'projects/{project_dir}/result.json') as json_file:
     data = json.load(json_file)
@@ -25,9 +25,9 @@ scale_pipeline = A.Compose([
 transform_pipeline = A.Compose([
     A.Affine(
         scale=(0.8, 1.2),
-        translate_percent=0,
+        translate_percent=(0.1, 0.1),
         rotate=0,
-        shear=(-5, 5),
+        shear=(-2, 2),
         cval=(0, 0, 0),
         p=1
     ),
@@ -40,14 +40,14 @@ transform_pipeline = A.Compose([
     )
 ], bbox_params=A.BboxParams(
     format='coco',
-    min_visibility=0.8,
+    min_visibility=0.9,
     label_fields=['class_labels']
 ))
 
 dir = 'tesstrain/data/LP-ground-truth'
 
 if not os.path.exists(dir):
-    os.makedirs(dir)
+   os.makedirs(dir)
 
 images = []
 include = set([
@@ -70,14 +70,23 @@ for annotation in data['annotations']:
     label = data['categories'][annotation['category_id']]['name']
     
     images[-1]['bboxes'].append(annotation['bbox'])
-    images[-1]['labels'].append(label)
+    images[-1]['labels'].append((label, annotation['bbox'][0]))
 
 for image in images:
-    image_name = image['file_name'].split('.')[0].split('/')[1]
+    if 'roa' in project_dir:
+        image_name = image['file_name'].split('.')[0].split('/')[1]
+        img = cv2.imread(f'projects/{project_dir}/images/{image_name}.jpg')
+    else:
+        image_name = image['file_name'].split('.')[0].split('/')[8]
+        img = cv2.imread(image['file_name'])
 
-    img = cv2.imread(f'projects/{project_dir}/{image["file_name"]}')
+    print(image_name)
 
-    scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
+    image['bboxes'].sort(key=lambda x: x[0])
+    image['labels'].sort(key=lambda x: x[1])
+    labels = [label for label, _ in image['labels']]
+
+    scaled = scale_pipeline(image=img, bboxes=image['bboxes'], class_labels=labels)
     scaled_img = scaled['image']
     scaled_bboxes = scaled['bboxes']
     scaled_labels = scaled['class_labels']
@@ -98,8 +107,8 @@ for image in images:
     
     cv2.imwrite(f'{dir}/eng_{image_name}.tif', scaled_img)
 
-    for i in range(1, 101):
-        transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=image['labels'])
+    for i in range(1, 51):
+        transformed = transform_pipeline(image=img, bboxes=image['bboxes'], class_labels=labels)
         transformed_img = transformed['image']
         transformed_bboxes = transformed['bboxes']
         transformed_labels = transformed['class_labels']
@@ -119,3 +128,5 @@ for image in images:
                 file.write(' '.join(line))
 
         cv2.imwrite(f'{dir}/eng_{image_name}_aug_{i}.tif', transformed_img)
+
+

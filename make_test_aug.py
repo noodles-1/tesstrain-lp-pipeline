@@ -14,7 +14,7 @@ transform_pipeline = A.Compose([
         scale=(0.8, 1.2),
         translate_percent=0,
         rotate=0,
-        shear=(-3, 3),
+        shear=(-5, 5),
         cval=(0, 0, 0),
         p=1
     ),
